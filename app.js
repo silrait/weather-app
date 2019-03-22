@@ -1,17 +1,35 @@
-geocode = require('./utils/geocode')
-forecast = require('./utils/forecast')
+const yargs = require('yargs')
+const geocode = require('./utils/geocode')
+const forecast = require('./utils/forecast')
 
-geocode('dionisio cerqueira, brazil', (error, data) => {
-    if(error){
-        return console.log(error)
-    }
+yargs.version('0.0.1')
 
-    forecast(data.latitute, data.longitude, (error, forecastData) => {
-        if(error){
-            return console.log(error)                
+yargs.command({
+    command: 'weather',
+    describe: 'Show the weather conditions for the given location',
+    builder: {
+        location: {
+            describe: 'Location of the forecast',
+            demandOption: true,
+            type: 'string'
         }
+    },
+    handler(argv){
+        geocode(argv.location, (error, data) => {
+            if(error){
+                return console.log(error)
+            }
         
-        console.log(data.location)               
-        console.log(forecastData)
-    })
+            forecast(data.latitute, data.longitude, (error, forecastData) => {
+                if(error){
+                    return console.log(error)                
+                }
+                
+                console.log(data.location)               
+                console.log(forecastData)
+            })
+        })
+    }
 })
+
+yargs.parse()
